@@ -1,0 +1,33 @@
+DELAY 500
+GUI r                     // Open Run dialog
+DELAY 500
+STRING powershell
+ENTER                     // Launch normal PowerShell
+DELAY 1000
+STRING Start-Process powershell -ArgumentList '-NoProfile -WindowStyle Hidden -Command "
+   powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c; ^          // High‑Performance plan
+   reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\OneDrive\" /f 2>nul; ^
+   reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\MicrosoftTeams\" /f 2>nul; ^
+   reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\Spotify\" /f 2>nul; ^
+   reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\Cortana\" /f 2>nul; ^
+   reg add \"HKCU\\Control Panel\\Desktop\" /v UserPreferencesMask /t REG_DWORD /d 0x90c00000 /f 2>nul; ^
+   rd /s /q \"%TEMP%\" 2>nul; ^
+   rd /s /q \"C:\\Windows\\Temp\" 2>nul; ^
+   # Remove common built‑in Windows Store apps (bloat)
+   Get-AppxPackage -AllUsers *xbox*               | Remove-AppxPackage -ErrorAction SilentlyContinue; ^
+   Get-AppxPackage -AllUsers *Microsoft.3DBuilder*| Remove-AppxPackage -ErrorAction SilentlyContinue; ^
+   Get-AppxPackage -AllUsers *Microsoft.Getstarted*| Remove-AppxPackage -ErrorAction SilentlyContinue; ^
+   Get-AppxPackage -AllUsers *Microsoft.Messaging*| Remove-AppxPackage -ErrorAction SilentlyContinue; ^
+   Get-AppxPackage -AllUsers *Microsoft.ZuneMusic*| Remove-AppxPackage -ErrorAction SilentlyContinue; ^
+   Get-AppxPackage -AllUsers *Microsoft.ZuneVideo*| Remove-AppxPackage -ErrorAction SilentlyContinue; ^
+   Get-AppxPackage -AllUsers *Microsoft.SkypeApp* | Remove-AppxPackage -ErrorAction SilentlyContinue; ^
+   # Disable rarely‑used services (optional)
+   Set-Service -Name \"DiagTrack\" -StartupType Disabled -ErrorAction SilentlyContinue; ^
+   Set-Service -Name \"WSearch\"   -StartupType Manual   -ErrorAction SilentlyContinue; ^
+   exit'" -Verb RunAs
+ENTER                     // Launch elevated PowerShell
+DELAY 2000
+ALT y                      // Accept UAC (Alt+Y)
+DELAY 2000
+ENTER                      // Confirm UAC
+DELAY 2000
